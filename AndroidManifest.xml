@@ -24,7 +24,7 @@
         </activity>
         <activity
             android:name=".SensitivityDialogActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" />
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />

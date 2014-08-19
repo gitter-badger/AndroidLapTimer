@@ -8,7 +8,7 @@
     <string name="label_status_calibrating">Calibrating...</string>
     <string name="label_status_ready">Ready</string>
     <string name="label_status_started">Started</string>
-    <string name="dialog_tutorial_text">1) Place the phone with the camera facing on a track lane. Keep it still.\n2) Press calibrate.\n3) Press start, the timer will start when the car passes.\n4) If you get weird data, try recalibrating. A well-lit environment helps.</string>
+    <string name="dialog_tutorial_text">• Place the phone with the camera facing on a track lane. Keep it still.\n• Press calibrate.\n• Press start, the timer will start when the car passes.\n• If you get weird data, try recalibrating. A well-lit environment helps.</string>
     <string name="menu_tutorial_label">Show tutorial</string>
     <string name="menu_sensitivity_label">Adjust sensitivity</string>
     <string name="menu_share_label">Share lap times</string>

@@ -43,6 +43,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	TextView lap3Label;
 	TextView lapBestLabel;
 	Button startButton;
+	Button calibrateButton;
 
 	// flags
 	boolean isPreviewRunning = false;
@@ -105,9 +106,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		findViewById(R.id.button_start).setOnClickListener(this);
-		findViewById(R.id.button_calibrate).setOnClickListener(this);
-
 		mSurfaceView = (SurfaceView) findViewById(R.id.surface_camera);
 		mSurfaceHolder = mSurfaceView.getHolder();
 		mSurfaceHolder.addCallback(this);
@@ -122,6 +120,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		lap3Label = (TextView) findViewById(R.id.text_lap_3);
 		lapBestLabel = (TextView) findViewById(R.id.text_lap_best);
 		startButton = (Button) findViewById(R.id.button_start);
+		calibrateButton = (Button) findViewById(R.id.button_calibrate);
+
+		startButton.setOnClickListener(this);
+		calibrateButton.setOnClickListener(this);
 
 		statusLabel.setText(getString(R.string.label_status_init));
 		startButton.setEnabled(false);
@@ -265,6 +267,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				isCalibrating = false;
 				isCalibrated = true;
 				startButton.setEnabled(true);
+				calibrateButton.setEnabled(true);
 				statusLabel.setText(getString(R.string.label_status_ready));
 
 				// calculate average from the 20 values
@@ -349,6 +352,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					// clicked on start while timer was running: stop everything
 					startButton.setText("Start");
 					statusLabel.setText(getString(R.string.label_status_ready));
+					calibrateButton.setEnabled(true);
 					isStarted = false;
 					isTimerRunning = false;
 					mHandler.removeCallbacks(mUpdateTimeTask);
@@ -357,6 +361,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					// clicked on start while timer was stopped: start everything
 					startButton.setText("Stop");
 					statusLabel.setText(getString(R.string.label_status_started));
+					calibrateButton.setEnabled(false);
 					timerLabel.setText("0:00:0");
 					isStarted = true;
 					mStartTime = 0L;
@@ -377,6 +382,9 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					// cannot calibrate while timer is running
 					break;
 				}
+				
+				startButton.setEnabled(false);
+				calibrateButton.setEnabled(false);
 
 				// started calibration: need to reset some stuff
 				statusLabel.setText(getString(R.string.label_status_calibrating));
