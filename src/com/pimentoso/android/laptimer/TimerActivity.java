@@ -30,66 +30,65 @@ import android.widget.Toast;
  * @author Pimentoso
  */
 public class TimerActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback, OnClickListener {
-
+	
 	// layout elements
-	SurfaceView mSurfaceView;
-	SurfaceHolder mSurfaceHolder;
-	Camera mCamera;
+	private SurfaceView mSurfaceView;
+	private SurfaceHolder mSurfaceHolder;
+	private Camera mCamera;
 
-	TextView timerLabel;
-	TextView statusLabel;
-	TextView lap1Label;
-	TextView lap2Label;
-	TextView lap3Label;
-	TextView lapBestLabel;
-	Button startButton;
-	Button calibrateButton;
+	private TextView timerLabel;
+	private TextView statusLabel;
+	private TextView lap1Label;
+	private TextView lap2Label;
+	private TextView lap3Label;
+	private TextView lapBestLabel;
+	private Button startButton;
+	private Button calibrateButton;
 
 	// flags
-	boolean isPreviewRunning = false;
-	boolean isCalibrating = false;
-	boolean isCalibrated = false;
-	boolean isStarted = false;
-	boolean isTimerRunning = false;
-	boolean caughtPreviousFrame = false;
+	private boolean isCalibrating = false;
+	private boolean isCalibrated = false;
+	private boolean isStarted = false;
+	private boolean isTimerRunning = false;
+	private boolean caughtPreviousFrame = false;
 
 	// frame counter during calibration
-	int frame = 0;
+	private int frame = 0;
 
 	// offsets of the 3 relevant pixels
-	int[] pixelOffset = new int[3];
+	private int[] pixelOffset = new int[3];
 
 	// color values of the 3 relevant pixels during calibration (20 frames are calculated)
-	int[][] calibrateRange = new int[3][20];
+	private int[][] calibrateRange = new int[3][20];
 
 	// final color values of the 3 relevant pixels after calibration
-	int[] calibrateValue = new int[3];
+	private int[] calibrateValue = new int[3];
 
 	// lightness difference threshold, over which the frame is caught (= a new lap is started)
 	public static int calibrateThreshold = 10;
 
 	// last frame catch milliseconds
-	long mLastCatchTime = 0;
+	private long mLastCatchTime = 0;
 
 	// best lap time
-	long bestLap = 0;
+	private long bestLap = 0;
 
 	// lap times
-	ArrayList<Long> laps = new ArrayList<Long>();
+	private ArrayList<Long> laps = new ArrayList<Long>();
 
 	// lap counter
-	int lapCount = 0;
+	private int lapCount = 0;
 
-	Handler mHandler = new Handler();
-	FPSCounter fps;
-	long mStartTime = 0L;
+	private Handler mHandler = new Handler();
+	private FPSCounter fps;
+	private long mStartTime = 0L;
 	
-	StringBuilder lapBuffer;
-	StringBuilder timeBuffer;
+	private StringBuilder lapBuffer;
+	private StringBuilder timeBuffer;
 	
-	static byte[] frameBuffer1;
-	static byte[] frameBuffer2;
-	static byte[] frameBuffer3;
+	private static byte[] frameBuffer1;
+	private static byte[] frameBuffer2;
+	private static byte[] frameBuffer3;
 
 	private Runnable mUpdateTimeTask = new Runnable() {
 
@@ -219,7 +218,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 			mCamera.setPreviewCallbackWithBuffer(this);
 			mCamera.startPreview();
-			isPreviewRunning = true;
 		}
 	}
 
@@ -231,7 +229,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				if (mCamera != null) {
 					mCamera.setPreviewCallback(null);
 					mCamera.stopPreview();
-					isPreviewRunning = false;
 				}
 			}
 			catch (Exception e) {
