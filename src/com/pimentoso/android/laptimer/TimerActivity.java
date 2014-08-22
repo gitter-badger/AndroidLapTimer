@@ -24,6 +24,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 /**
  * Main activity for Mini4WD Lap Timer.
  * 
@@ -128,6 +131,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		startButton.setEnabled(false);
 		
 		fps = new FPSCounter();
+		
+		AdView adView = (AdView) this.findViewById(R.id.adView);
+	    AdRequest adRequest = new AdRequest.Builder().build();
+	    adView.loadAd(adRequest);
 	}
 
 	@Override

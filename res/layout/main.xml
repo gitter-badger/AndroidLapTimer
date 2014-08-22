@@ -1,133 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_gravity="center"
-    android:background="@drawable/bg"
-    android:keepScreenOn="true"
-    android:orientation="vertical"
-    android:padding="22dp" >
+    android:keepScreenOn="true" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_margin="8dp" >
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/bg"
+        android:orientation="vertical" >
 
-        <RelativeLayout
-            android:layout_width="60dp"
-            android:layout_height="90dp" >
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:orientation="horizontal" >
 
-            <SurfaceView
-                android:id="@+id/surface_camera"
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="90dp" >
+
+                <SurfaceView
+                    android:id="@+id/surface_camera"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="------"
+                    android:textColor="@color/red_bar"
+                    android:textSize="24sp" />
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/text_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="0:00:0"
+                    android:textColor="@color/red_text"
+                    android:textSize="40sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/text_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/text"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical" >
 
             <TextView
+                android:id="@+id/text_lap_best"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="------"
-                android:textColor="@color/red_bar"
-                android:textSize="24sp" />
-        </RelativeLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:text="Best lap: 0:00:0"
+                android:textColor="@color/red_text"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_lap_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Lap 0: 0:00:0"
+                android:textColor="@color/red_text"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_lap_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Lap 0: 0:00:0"
+                android:textColor="@color/text"
+                android:textSize="24sp"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/text_lap_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15dp"
+                android:text="Lap 0: 0:00:0"
+                android:textColor="@color/text"
+                android:textSize="24sp"
+                android:visibility="invisible" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/text_timer"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_start"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="0:00:0"
-                android:textColor="@color/red_text"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:typeface="monospace" />
+                android:layout_margin="8dp"
+                android:text="Start" />
 
-            <TextView
-                android:id="@+id/text_status"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_calibrate"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/text"
-                android:textSize="20sp" />
+                android:layout_margin="8dp"
+                android:text="@string/label_calibrate" />
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical" >
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="ca-app-pub-2287777906085748/3458482348" />
 
-        <TextView
-            android:id="@+id/text_lap_best"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="5dp"
-            android:text="Best lap: 0:00:0"
-            android:textColor="@color/red_text"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/text_lap_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Lap 0: 0:00:0"
-            android:textColor="@color/red_text"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/text_lap_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Lap 0: 0:00:0"
-            android:textColor="@color/text"
-            android:textSize="24sp"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/text_lap_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="15dp"
-            android:text="Lap 0: 0:00:0"
-            android:textColor="@color/text"
-            android:textSize="24sp"
-            android:visibility="invisible" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/button_start"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:layout_margin="8dp" />
-
-        <Button
-            android:id="@+id/button_calibrate"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_calibrate"
-            android:layout_margin="8dp" />
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
