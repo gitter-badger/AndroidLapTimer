@@ -31,11 +31,15 @@ import android.widget.Toast;
  */
 public class TimerActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback, OnClickListener {
 	
+	private static final long DEFAULT_CATCH_DELAY = 500;
+	private static final long CALIBRATION_ERROR_FRAMES = 20;
+	
 	// layout elements
 	private SurfaceView mSurfaceView;
 	private SurfaceHolder mSurfaceHolder;
 	private Camera mCamera;
 
+	private View cameraBar;
 	private TextView timerLabel;
 	private TextView statusLabel;
 	private TextView lap1Label;
@@ -50,7 +54,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	private boolean isCalibrated = false;
 	private boolean isStarted = false;
 	private boolean isTimerRunning = false;
-	private boolean caughtPreviousFrame = false;
 
 	// frame counter during calibration
 	private int frame = 0;
@@ -69,6 +72,9 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 	// last frame catch milliseconds
 	private long mLastCatchTime = 0;
+	
+	// number of frames caught subsequentially (for calibration warning purposes)
+	private int subsequentFramesCaught = 0;
 
 	// best lap time
 	private long bestLap = 0;
@@ -112,6 +118,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 		calibrateThreshold = DefaultPreferences.get(this, "sensitivity", SensitivityDialogActivity.DEFAULT_SENSITIVITY);
 
+		cameraBar = findViewById(R.id.camera_bar);
 		timerLabel = (TextView) findViewById(R.id.text_timer);
 		statusLabel = (TextView) findViewById(R.id.text_status);
 		lap1Label = (TextView) findViewById(R.id.text_lap_1);
@@ -148,7 +155,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder arg0) {
+	public void surfaceCreated(SurfaceHolder surface) {
 
 		synchronized (this) {
 			
@@ -191,15 +198,16 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 			/* calculate pixel offsets from the top left corner.
 			 * the app takes 3 relevant pixels in the center of the camera, and checks for variation in only those 3 pixels.
-			 * the pixels are positioned in the middle line of the camera surface, at 10%, 50% and 90% of width, for example like this:
+			 * the pixels are positioned in the middle line of the camera surface, at 10%, 50% and 90% of width.
+			 * (the camera is then rotated to portrait)
 			 * 
 			 *         CAMERA
 			 * +--------------------+
+			 * |         0          |
 			 * |                    |
+			 * |         1          |
 			 * |                    |
-			 * | 0       1        2 |
-			 * |                    |
-			 * |                    |
+			 * |         2          |
 			 * +--------------------+
 			 */
 			pixelOffset[0] = (int) (mCameraSize.width / 2) + (mCameraSize.width * (int) (mCameraSize.height * 0.1));
@@ -210,7 +218,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 			mCamera.setDisplayOrientation(90);
 
 			try {
-				mCamera.setPreviewDisplay(arg0);
+				mCamera.setPreviewDisplay(surface);
 			}
 			catch (IOException e) {
 				Log.e("Camera", "Could not set preview display");
@@ -249,6 +257,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		int value0 = (int) yuv[pixelOffset[0]] & 0xFF;
 		int value1 = (int) yuv[pixelOffset[1]] & 0xFF;
 		int value2 = (int) yuv[pixelOffset[2]] & 0xFF;
+		
+		cameraBar.setBackgroundColor(getResources().getColor(R.color.bar_red));
 
 		// calibrating...
 		if (isCalibrating) {
@@ -265,7 +275,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				isCalibrated = true;
 				startButton.setEnabled(true);
 				calibrateButton.setEnabled(true);
-				statusLabel.setText(getString(R.string.label_status_ready));
+				statusLabel.setText(getString(R.string.label_status_calibrated));
 
 				// calculate average from the 20 values
 				int tot0 = 0, tot1 = 0, tot2 = 0;
@@ -281,37 +291,47 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 			}
 		}
 
-		// running, listening for lightness variations
-		else if (isStarted) {
+		// calibrated, listening for lightness variations
+		else if (isCalibrated) {
+			
+			boolean frameCaught = (value0 < calibrateValue[0] - calibrateThreshold
+					|| value0 > calibrateValue[0] + calibrateThreshold
+					|| value1 < calibrateValue[1] - calibrateThreshold
+					|| value1 > calibrateValue[1] + calibrateThreshold
+					|| value2 < calibrateValue[2] - calibrateThreshold
+					|| value2 > calibrateValue[2] + calibrateThreshold);
+			
+			if (frameCaught) {
+				subsequentFramesCaught++;
+				cameraBar.setBackgroundColor(getResources().getColor(R.color.bar_green));
+			}
+			else {
+				subsequentFramesCaught = 0;
+			}
 
 			// check if car has passed
-			if (isCalibrated && 
-					(value0 < calibrateValue[0] - calibrateThreshold || value0 > calibrateValue[0] + calibrateThreshold || 
-						value1 < calibrateValue[1] - calibrateThreshold || value1 > calibrateValue[1] + calibrateThreshold ||
-						value2 < calibrateValue[2] - calibrateThreshold || value2 > calibrateValue[2] + calibrateThreshold)) {
+			if (isStarted && frameCaught) {
+
+				// caught lap: calculate time
+				long catchTime = SystemClock.uptimeMillis();
+				long lapTime = catchTime - mLastCatchTime;
 				
-				// ignore subsequent frame catches
-				if (!caughtPreviousFrame) {
-
-					caughtPreviousFrame = true;
-
+				// ignore lap if previous frame was caught, and time is below threshold
+				if (subsequentFramesCaught == 1 && lapTime >= DEFAULT_CATCH_DELAY) {
 					if (isTimerRunning) {
 						// car has passed: start a new lap
-						long catchTime = SystemClock.uptimeMillis();
 						lapCount++;
-
-						long lapTime = catchTime - mLastCatchTime;
 						laps.add(lapTime);
-
+	
 						if (lapCount == 1) {
 							bestLap = lapTime;
 						}
 						else if (bestLap > lapTime) {
 							bestLap = lapTime;
 						}
-
+	
 						printLaps();
-
+	
 						mLastCatchTime = catchTime;
 					}
 					else {
@@ -321,12 +341,14 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 						mLastCatchTime = mStartTime;
 						mHandler.removeCallbacks(mUpdateTimeTask);
 						mHandler.postDelayed(mUpdateTimeTask, 50);
+						statusLabel.setText(getString(R.string.label_status_started));
 					}
 				}
 			}
-			else {
-				caughtPreviousFrame = false;
-			}
+		}
+		
+		if (subsequentFramesCaught > CALIBRATION_ERROR_FRAMES) {
+			statusLabel.setText(getString(R.string.label_status_calibration_error));
 		}
 
 		mCamera.addCallbackBuffer(yuv);
@@ -348,7 +370,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				if (isStarted) {
 					// clicked on start while timer was running: stop everything
 					startButton.setText("Start");
-					statusLabel.setText(getString(R.string.label_status_ready));
+					statusLabel.setText(getString(R.string.label_status_stopped));
 					calibrateButton.setEnabled(true);
 					isStarted = false;
 					isTimerRunning = false;
@@ -357,7 +379,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				else {
 					// clicked on start while timer was stopped: start everything
 					startButton.setText("Stop");
-					statusLabel.setText(getString(R.string.label_status_started));
+					statusLabel.setText(getString(R.string.label_status_ready));
 					calibrateButton.setEnabled(false);
 					timerLabel.setText("0:00:0");
 					isStarted = true;
@@ -501,7 +523,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 			}
 			case R.id.menu_sensitivity: {
 				startButton.setText("Start");
-				statusLabel.setText(getString(R.string.label_status_ready));
+				statusLabel.setText(getString(R.string.label_status_stopped));
 				isStarted = false;
 				isTimerRunning = false;
 				mHandler.removeCallbacks(mUpdateTimeTask);
@@ -537,9 +559,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	public void showAlertBox() {
 		new AlertDialog.Builder(this)
 		.setMessage(getString(R.string.dialog_tutorial_text))
-		.setTitle("Tutorial")
+		.setTitle("How to use")
 		.setCancelable(true)
-		.setIcon(android.R.drawable.ic_dialog_info)
 		.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {	
