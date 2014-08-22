@@ -2,6 +2,7 @@ package com.pimentoso.android.laptimer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -52,6 +53,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	private Button startButton;
 	private Button calibrateButton;
 
+	// camera preview dimensions
+	private int cameraWidth;
+	private int cameraHeight;
+	
 	// flags
 	private boolean isCalibrating = false;
 	private boolean isCalibrated = false;
@@ -189,11 +194,18 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				return;
 			}
 
-			// create 3 framebuffers
 			Camera.Parameters parameters = mCamera.getParameters();
-			Camera.Size mCameraSize = parameters.getPreviewSize();
+
+			// find smallest camera preview size (it's good for fps)
+			Camera.Size smallestPreviewSize = getSmallestPreviewSize(parameters);
+			
+			cameraWidth = smallestPreviewSize.width;
+			cameraHeight = smallestPreviewSize.height;
+			parameters.setPreviewSize(cameraWidth, cameraHeight);
+
+			// create 3 framebuffers
 			int bytesPerPixel = ImageFormat.getBitsPerPixel(parameters.getPreviewFormat());
-			int bufferSize = (mCameraSize.width * mCameraSize.height * bytesPerPixel) >> 3;
+			int bufferSize = (cameraWidth * cameraHeight * bytesPerPixel) >> 3;
 			
 			frameBuffer1 = new byte[bufferSize];
 			frameBuffer2 = new byte[bufferSize];
@@ -217,11 +229,12 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 			 * |         2          |
 			 * +--------------------+
 			 */
-			pixelOffset[0] = (int) (mCameraSize.width / 2) + (mCameraSize.width * (int) (mCameraSize.height * 0.1));
-			pixelOffset[1] = (int) (mCameraSize.width / 2) + (mCameraSize.width * (int) (mCameraSize.height * 0.5));
-			pixelOffset[2] = (int) (mCameraSize.width / 2) + (mCameraSize.width * (int) (mCameraSize.height * 0.9));
+			pixelOffset[0] = (int) (cameraWidth / 2) + (cameraWidth * (int) (cameraHeight * 0.1));
+			pixelOffset[1] = (int) (cameraWidth / 2) + (cameraWidth * (int) (cameraHeight * 0.5));
+			pixelOffset[2] = (int) (cameraWidth / 2) + (cameraWidth * (int) (cameraHeight * 0.9));
 
 			// init camera preview
+			mCamera.setParameters(parameters);
 			mCamera.setDisplayOrientation(90);
 
 			try {
@@ -433,6 +446,26 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				break;
 			}
 		}
+	}
+	
+	private Camera.Size getSmallestPreviewSize(Camera.Parameters parameters) {
+		List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+		if (supportedPreviewSizes.size() == 1) {
+			return supportedPreviewSizes.get(0);
+		}
+		
+		int index = 0;
+		int width = 0;
+		Camera.Size size = null;
+		for (int i = supportedPreviewSizes.size(); --i >= 0;) {
+			size = supportedPreviewSizes.get(i);
+			if (width == 0 || size.width < width) {
+				width = size.width;
+				index = i;
+			}
+		}
+		
+		return supportedPreviewSizes.get(index);
 	}
 
 	private String convertTime(long millis) {
