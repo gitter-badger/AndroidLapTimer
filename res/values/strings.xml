@@ -12,7 +12,11 @@
     <string name="label_status_ready">Waiting for car pass</string>
     <string name="label_status_started">Car running</string>
     <string name="label_status_stopped">Session completed</string>
-    <string name="dialog_tutorial_text">The app detects passage of the car when it passes on the red line in the camera preview.\n\n• Place the phone with the camera facing on a track lane. Keep it still.\n• Press calibrate.\n• Press start, the timer will start when the car passes.\n• Please use the app in a well-lit environment.</string>
+    <string name="dialog_tutorial_text">"The app detects passage of the car when it passes on the red line in the camera preview.
+• Place the phone with the camera facing on a track lane. Keep it still.
+• Press calibrate.
+• Press start, the timer will start when the car passes.
+• Please use the app in a well-lit environment."</string>
     <string name="menu_tutorial_label">Show tutorial</string>
     <string name="menu_sensitivity_label">Adjust sensitivity</string>
     <string name="menu_share_label">Share lap times</string>

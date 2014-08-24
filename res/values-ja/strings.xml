@@ -12,7 +12,11 @@
     <string name="label_status_ready">車通過待ち</string>
     <string name="label_status_started">車稼働</string>
     <string name="label_status_stopped">一周完成</string>
-    <string name="dialog_tutorial_text">カメラプレビュー内の赤線の位置で通過を感知します。\n\n• コースにカメラの面を向けて設置して、そのまま保持してください。\n• キャリブレーボタンを押してください。\n• スタートボタンを押してください。車がカメラの前を通過するとタイマーがスタートします。\n• 明るい場所で使用することをお勧めします。</string>
+    <string name="dialog_tutorial_text">"カメラプレビュー内の赤線の位置で通過を感知します。
+• コースにカメラの面を向けて設置して、そのまま保持してください。
+• キャリブレーボタンを押してください。
+• スタートボタンを押してください。車がカメラの前を通過するとタイマーがスタートします。
+• 明るい場所で使用することをお勧めします。</string>
     <string name="menu_tutorial_label">案内</string>
     <string name="menu_sensitivity_label">感度の調整</string>
     <string name="menu_share_label">ラップタイムを送信</string>
