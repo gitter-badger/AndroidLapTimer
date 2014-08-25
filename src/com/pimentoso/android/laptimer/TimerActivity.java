@@ -389,7 +389,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 				if (isStarted) {
 					// clicked on start while timer was running: stop everything
-					startButton.setText("Start");
+					startButton.setText(getString(R.string.label_start));
 					statusLabel.setText(getString(R.string.label_status_stopped));
 					calibrateButton.setEnabled(true);
 					isStarted = false;
@@ -398,7 +398,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				}
 				else {
 					// clicked on start while timer was stopped: start everything
-					startButton.setText("Stop");
+					startButton.setText(getString(R.string.label_stop));
 					statusLabel.setText(getString(R.string.label_status_ready));
 					calibrateButton.setEnabled(false);
 					timerLabel.setText("0:00:0");
@@ -562,7 +562,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				return true;
 			}
 			case R.id.menu_sensitivity: {
-				startButton.setText("Start");
+				startButton.setText(getString(R.string.label_start));
 				statusLabel.setText(getString(R.string.label_status_stopped));
 				isStarted = false;
 				isTimerRunning = false;

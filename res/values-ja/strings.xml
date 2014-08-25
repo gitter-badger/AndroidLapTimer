@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mini4WD Lap Timer</string>
+    <string name="label_start">スタート</string>
+    <string name="label_stop">ストップ</string>
+    <string name="label_calibrate">キャリブレト</string>
+    <string name="label_sensitivity">感度</string>
+    <string name="label_status_init">キャリブレト待ち</string>
+    <string name="label_status_calibrating">キャリブレト中</string>
+    <string name="label_status_calibrated">キャリブレト OK</string>
+    <string name="label_status_calibration_error">もう一度キャリブレトしてください!</string>
+    <string name="label_status_ready">車通過待ち</string>
+    <string name="label_status_started">車稼働</string>
+    <string name="label_status_stopped">一周完成</string>
+    <string name="dialog_tutorial_text">"カメラプレビュー内の赤線の位置で通過を感知します。
+• コースにカメラの面を向けて設置して、そのまま保持してください。
+• キャリブレーボタンを押してください。
+• スタートボタンを押してください。車がカメラの前を通過するとタイマーがスタートします。
+• 明るい場所で使用することをお勧めします。</string>
+    <string name="menu_tutorial_label">案内</string>
+    <string name="menu_sensitivity_label">感度の調整</string>
+    <string name="menu_share_label">ラップタイムを送信</string>
+    <string name="dialog_sensitivity_text">感度を調整します</string>
+    <string name="dialog_sensitivity_high">高い</string>
+    <string name="dialog_sensitivity_low">低い</string>
+    <string name="dialog_sensitivity_default">デフォルト</string>
+    <string name="dialog_sensitivity_save">セーブ</string>
+    <string name="error_camera_locked_text">他のプログラムによってカメラが使われています。</string>
+    <string name="error_camera_null_text">カメラを使用できません。</string>
+    <string name="error_laps_empty">データがありません。</string>
+    <string name="error_timer_started">操作する前にタイマーを停止してください。</string>
+</resources>
+
+

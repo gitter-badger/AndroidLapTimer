@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, CameraPreview!</string>
     <string name="app_name">Mini4WD Lap Timer</string>
+    <string name="label_start">Start</string>
+    <string name="label_stop">Stop</string>
     <string name="label_calibrate">Calibrate</string>
     <string name="label_sensitivity">Sensitivity</string>
     <string name="label_status_init">Waiting calibration</string>
@@ -10,14 +11,22 @@
     <string name="label_status_calibration_error">Please recalibrate!</string>
     <string name="label_status_ready">Waiting for car pass</string>
     <string name="label_status_started">Car running</string>
-    <string name="label_status_stopped">Run completed</string>
-    <string name="dialog_tutorial_text">• Place the phone with the camera facing on a track lane. Keep it still.\n• Press calibrate.\n• Press start, the timer will start when the car passes.\n• If you get weird data, try recalibrating. A well-lit environment helps.</string>
+    <string name="label_status_stopped">Session completed</string>
+    <string name="dialog_tutorial_text">"The app detects passage of the car when it passes on the red line in the camera preview.
+• Place the phone with the camera facing on a track lane. Keep it still.
+• Press calibrate.
+• Press start, the timer will start when the car passes.
+• Please use the app in a well-lit environment."</string>
     <string name="menu_tutorial_label">Show tutorial</string>
     <string name="menu_sensitivity_label">Adjust sensitivity</string>
     <string name="menu_share_label">Share lap times</string>
-    <string name="dialog_sensitivity_text">Adjust lap timer sensitivity.</string>
+    <string name="dialog_sensitivity_text">Adjust lap timer sensitivity</string>
+    <string name="dialog_sensitivity_high">high</string>
+    <string name="dialog_sensitivity_low">low</string>
+    <string name="dialog_sensitivity_default">Default</string>
+    <string name="dialog_sensitivity_save">Save</string>
     <string name="error_camera_locked_text">Phone camera is already in use by other programs.</string>
     <string name="error_camera_null_text">Could not start phone camera.</string>
-    <string name="error_laps_empty">No data to send.</string>
-    <string name="error_timer_started">You must stop the timer to send data.</string>
+    <string name="error_laps_empty">Nothing to share.</string>
+    <string name="error_timer_started">You must stop the timer to share data.</string>
 </resources>
