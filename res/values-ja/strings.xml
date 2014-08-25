@@ -12,6 +12,7 @@
     <string name="label_status_ready">車通過待ち</string>
     <string name="label_status_started">車稼働</string>
     <string name="label_status_stopped">一周完成</string>
+    <string name="dialog_tutorial_title">案内</string>
     <string name="dialog_tutorial_text">"カメラプレビュー内の赤線の位置で通過を感知します。
 • コースにカメラの面を向けて設置して、そのまま保持してください。
 • キャリブレーボタンを押してください。

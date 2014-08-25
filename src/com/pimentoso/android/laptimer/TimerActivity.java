@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -49,6 +51,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	private TextView lapBestLabel;
 	private Button startButton;
 	private Button calibrateButton;
+	private SoundPool soundPool;
+	private int lapSound;
 
 	// camera preview dimensions
 	private int cameraWidth;
@@ -138,6 +142,9 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 		statusLabel.setText(getString(R.string.label_status_init));
 		startButton.setEnabled(false);
+
+		soundPool = new SoundPool(10, AudioManager.STREAM_NOTIFICATION, 0);
+		lapSound = soundPool.load(this, R.raw.lap, 1);
 		
 		fps = new FPSCounter();
 	}
@@ -195,6 +202,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 			cameraWidth = smallestPreviewSize.width;
 			cameraHeight = smallestPreviewSize.height;
 			parameters.setPreviewSize(cameraWidth, cameraHeight);
+			Log.d("Mini4WD Lap Timer", "Camera preview size: " + cameraWidth + "x" + cameraHeight);
 
 			// create 3 framebuffers
 			int bytesPerPixel = ImageFormat.getBitsPerPixel(parameters.getPreviewFormat());
@@ -356,6 +364,9 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 						mHandler.postDelayed(mUpdateTimeTask, 50);
 						statusLabel.setText(getString(R.string.label_status_started));
 					}
+					
+					// play sound
+					soundPool.play(lapSound, 1f, 1f, 1, 0, 1f);
 				}
 			}
 		}
@@ -592,7 +603,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	public void showAlertBox() {
 		new AlertDialog.Builder(this)
 		.setMessage(getString(R.string.dialog_tutorial_text))
-		.setTitle("How to use")
+		.setTitle(getString(R.string.dialog_tutorial_title))
 		.setCancelable(true)
 		.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
