@@ -369,10 +369,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					soundPool.play(lapSound, 1f, 1f, 1, 0, 1f);
 				}
 			}
-		}
-		
-		if (subsequentFramesCaught > CALIBRATION_ERROR_FRAMES) {
-			statusLabel.setText(getString(R.string.label_status_calibration_error));
+			
+			if (subsequentFramesCaught > CALIBRATION_ERROR_FRAMES) {
+				statusLabel.setText(getString(R.string.label_status_calibration_error));
+			}
 		}
 
 		mCamera.addCallbackBuffer(yuv);
