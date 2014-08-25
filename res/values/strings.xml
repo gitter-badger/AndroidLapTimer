@@ -12,6 +12,7 @@
     <string name="label_status_ready">Waiting for car pass</string>
     <string name="label_status_started">Car running</string>
     <string name="label_status_stopped">Session completed</string>
+    <string name="dialog_tutorial_title">How to use</string>
     <string name="dialog_tutorial_text">"The app detects passage of the car when it passes on the red line in the camera preview.
 • Place the phone with the camera facing on a track lane. Keep it still.
 • Press calibrate.

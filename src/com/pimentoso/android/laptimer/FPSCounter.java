@@ -9,7 +9,7 @@ public class FPSCounter {
     public void logFrame() {
         frames++;
         if(System.nanoTime() - startTime >= 1000000000) {
-            Log.d("FPSCounter", "fps: " + frames);
+            Log.d("Mini4WD Lap Timer FPS", Integer.toString(frames));
             frames = 0;
             startTime = System.nanoTime();
         }
