@@ -37,8 +37,8 @@ import com.google.android.gms.ads.AdView;
  */
 public class TimerActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback, OnClickListener {
 	
-	private static final long DEFAULT_CATCH_DELAY = 500;
-	private static final long CALIBRATION_ERROR_FRAMES = 20;
+	private static final long DEFAULT_CATCH_DELAY = 500; // ignore laps shorter than this
+	private static final long CALIBRATION_ERROR_FRAMES = 40; // how many consecutive frames caught before calibration warning (about 2 sec) 
 	
 	// layout elements
 	private SurfaceView mSurfaceView;
