@@ -1,7 +1,12 @@
 package com.pimentoso.android.laptimer;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -13,6 +18,7 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
@@ -24,6 +30,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,8 +41,8 @@ import android.widget.Toast;
  */
 public class TimerActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback, OnClickListener {
 	
-	private static final long DEFAULT_CATCH_DELAY = 500;
-	private static final long CALIBRATION_ERROR_FRAMES = 20;
+	private static final long DEFAULT_CATCH_DELAY = 500; // ignore laps shorter than this
+	private static final long CALIBRATION_ERROR_FRAMES = 40; // how many consecutive frames caught before calibration warning (about 2 sec) 
 	
 	// layout elements
 	private SurfaceView mSurfaceView;
@@ -45,10 +52,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	private View cameraBar;
 	private TextView timerLabel;
 	private TextView statusLabel;
-	private TextView lap1Label;
-	private TextView lap2Label;
-	private TextView lap3Label;
-	private TextView lapBestLabel;
+	private ListView lapList;
+	private LapListAdapter lapListAdapter;
 	private Button startButton;
 	private Button calibrateButton;
 	private SoundPool soundPool;
@@ -85,21 +90,12 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	// number of frames caught subsequentially (for calibration warning purposes)
 	private int subsequentFramesCaught = 0;
 
-	// best lap time
-	private long bestLap = 0;
-
 	// lap times
 	private ArrayList<Long> laps = new ArrayList<Long>();
-
-	// lap counter
-	private int lapCount = 0;
 
 	private Handler mHandler = new Handler();
 	private FPSCounter fps;
 	private long mStartTime = 0L;
-	
-	private StringBuilder lapBuffer;
-	private StringBuilder timeBuffer;
 	
 	private static byte[] frameBuffer1;
 	private static byte[] frameBuffer2;
@@ -118,24 +114,32 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		
+		// force localization, for debugging purposes
+		/*
+		String languageToLoad  = "ja";
+	    Locale locale = new Locale(languageToLoad); 
+	    Locale.setDefault(locale);
+	    Configuration config = new Configuration();
+	    config.locale = locale;
+	    getBaseContext().getResources().updateConfiguration(config, 
+	    getBaseContext().getResources().getDisplayMetrics());
+	    */
+		
 		setContentView(R.layout.main);
 
 		mSurfaceView = (SurfaceView) findViewById(R.id.surface_camera);
 		mSurfaceHolder = mSurfaceView.getHolder();
 		mSurfaceHolder.addCallback(this);
-		// mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		calibrateThreshold = DefaultPreferences.get(this, "sensitivity", SensitivityDialogActivity.DEFAULT_SENSITIVITY);
 
 		cameraBar = findViewById(R.id.camera_bar);
 		timerLabel = (TextView) findViewById(R.id.text_timer);
 		statusLabel = (TextView) findViewById(R.id.text_status);
-		lap1Label = (TextView) findViewById(R.id.text_lap_1);
-		lap2Label = (TextView) findViewById(R.id.text_lap_2);
-		lap3Label = (TextView) findViewById(R.id.text_lap_3);
-		lapBestLabel = (TextView) findViewById(R.id.text_lap_best);
 		startButton = (Button) findViewById(R.id.button_start);
 		calibrateButton = (Button) findViewById(R.id.button_calibrate);
+		lapList = (ListView) findViewById(R.id.list_laps);
 
 		startButton.setOnClickListener(this);
 		calibrateButton.setOnClickListener(this);
@@ -341,18 +345,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 				if (subsequentFramesCaught == 1 && lapTime >= DEFAULT_CATCH_DELAY) {
 					if (isTimerRunning) {
 						// car has passed: start a new lap
-						lapCount++;
 						laps.add(lapTime);
-	
-						if (lapCount == 1) {
-							bestLap = lapTime;
-						}
-						else if (bestLap > lapTime) {
-							bestLap = lapTime;
-						}
-	
-						printLaps();
-	
+						refreshLaps();
 						mLastCatchTime = catchTime;
 					}
 					else {
@@ -408,13 +402,11 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					timerLabel.setText("0:00:0");
 					isStarted = true;
 					mStartTime = 0L;
-					lapCount = 0;
 
 					// reset laps list
 					laps = new ArrayList<Long>();
-					bestLap = 0;
 
-					printLaps();
+					refreshLaps();
 				}
 
 				break;
@@ -435,7 +427,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 				frame = 0;
 				mStartTime = 0L;
-				lapCount = 0;
 				isStarted = false;
 				isTimerRunning = false;
 				isCalibrating = true;
@@ -443,9 +434,8 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 				// reset lap list
 				laps = new ArrayList<Long>();
-				bestLap = 0;
 
-				printLaps();
+				refreshLaps();
 
 				break;
 			}
@@ -472,80 +462,35 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		return supportedPreviewSizes.get(index);
 	}
 
-	private String convertTime(long millis) {
+
+	public static StringBuilder sb = new StringBuilder();
+	
+	public static String convertTime(long millis) {
 
 		if (millis == 0) {
 			return "0:00:0";
 		}
 
-		timeBuffer = new StringBuilder();
+		sb.setLength(0);
 		int split = ((int) (millis / 100)) % 10;
 		int seconds = (int) (millis / 1000);
 		int minutes = seconds / 60;
 		seconds = seconds % 60;
 
 		if (seconds < 10) {
-			timeBuffer.append(minutes).append(":0").append(seconds).append(":").append(split);
+			sb.append(minutes).append(":0").append(seconds).append(":").append(split);
 		}
 		else {
-			timeBuffer.append(minutes).append(":").append(seconds).append(":").append(split);
+			sb.append(minutes).append(":").append(seconds).append(":").append(split);
 		}
 		
-		return timeBuffer.toString();
+		return sb.toString();
 	}
 
-	private void printLaps() {
-
-		lapBuffer = new StringBuilder();
-		lapBuffer.append("Lap ").append(lapCount).append(": ");
-		
-		try {
-			lapBuffer.append(convertTime(laps.get(laps.size() - 1)));
-		}
-		catch (IndexOutOfBoundsException e) {
-			lapBuffer.append(convertTime(0));
-		}
-		lap1Label.setText(lapBuffer.toString());
-		
-		lapBuffer = new StringBuilder();
-		
-		if (lapCount > 1) {
-			lapBuffer.append("Lap ").append(lapCount - 1).append(": ");
-			lap2Label.setVisibility(View.VISIBLE);
-		}
-		else {
-			lapBuffer.append("Lap 0: ");
-		}
-		
-		try {
-			lapBuffer.append(convertTime(laps.get(laps.size() - 2)));
-		}
-		catch (IndexOutOfBoundsException e) {
-			lapBuffer.append(convertTime(0));
-		}
-		lap2Label.setText(lapBuffer.toString());
-		
-		lapBuffer = new StringBuilder();
-		
-		if (lapCount > 2) {
-			lapBuffer.append("Lap ").append(lapCount - 2).append(": ");
-			lap3Label.setVisibility(View.VISIBLE);
-		}
-		else {
-			lapBuffer.append("Lap 0: ");
-		}
-		
-		try {
-			lapBuffer.append(convertTime(laps.get(laps.size() - 3)));
-		}
-		catch (IndexOutOfBoundsException e) {
-			lapBuffer.append(convertTime(0));
-		}
-		lap3Label.setText(lapBuffer.toString());
-		
-		lapBuffer = new StringBuilder();
-		lapBuffer.append("Best lap: ").append(convertTime(bestLap));
-		lapBestLabel.setText(lapBuffer.toString());
+	private void refreshLaps() {
+		lapListAdapter = new LapListAdapter(this, laps);
+		lapList.setAdapter(lapListAdapter);
+		lapListAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -596,6 +541,42 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 				return true;
 			}
+			case R.id.menu_csv: {
+				if (isStarted || isTimerRunning) {
+					Toast.makeText(this, getString(R.string.error_timer_started), Toast.LENGTH_SHORT).show();
+					return true;
+				}
+				if (laps == null || laps.size() == 0) {
+					Toast.makeText(this, getString(R.string.error_laps_empty), Toast.LENGTH_SHORT).show();
+					return true;
+				}
+
+				String csv = lapsToCSV();
+				
+				// save csv file in SD card
+				try {
+					File directory = new File(Environment.getExternalStorageDirectory(), "/Mini4WD/");
+					directory.mkdirs();
+					
+					SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss");
+					String filename = "/Mini4WD/times-" + format.format(new Date()) + ".csv";
+					File file = new File(Environment.getExternalStorageDirectory(), filename);
+					file.createNewFile();
+					
+					FileOutputStream fos = new FileOutputStream(file);
+					OutputStreamWriter writer = new OutputStreamWriter(fos);
+					writer.append(csv);
+					writer.close();
+					fos.close();
+					
+					Toast.makeText(getBaseContext(), filename, Toast.LENGTH_LONG).show();
+				} 
+				catch (Exception e) {
+					Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+				}
+				
+				return true;
+			}
 		}
 		return false;
 	}
@@ -620,13 +601,40 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		s.append("Mini 4WD Android Lap Timer data");
 		s.append("\n\n");
 
+		long bestTime = Long.MAX_VALUE;
+		int bestIndex = 0;
+		
 		for (int i = 0; i < laps.size(); i++) {
 			long lap = laps.get(i);
-			s.append("Lap ").append(i + 1).append(": ").append(convertTime(lap)).append("\n");
+			
+			if (lap < bestTime) {
+				bestTime = lap;
+				bestIndex = i;
+			}
+		}
+		
+		for (int i = 0; i < laps.size(); i++) {
+			long lap = laps.get(i);
+			s.append("Lap ").append(i + 1).append(": ").append(convertTime(lap));
+			
+			if (i == bestIndex)
+				s.append(" (best)");
+			
+			s.append("\n");
 		}
 
-		s.append("\n");
-		s.append("Best lap: " + convertTime(bestLap));
+		return s.toString();
+	}
+	
+	private String lapsToCSV() {
+
+		StringBuilder s = new StringBuilder();
+		s.append("lap,time,milliseconds").append("\r\n");
+
+		for (int i = 0; i < laps.size(); i++) {
+			long lap = laps.get(i);
+			s.append(i + 1).append(",").append(convertTime(lap)).append(",").append(lap).append("\r\n");
+		}
 
 		return s.toString();
 	}

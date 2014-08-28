@@ -20,7 +20,8 @@
 • Please use the app in a well-lit environment."</string>
     <string name="menu_tutorial_label">Show tutorial</string>
     <string name="menu_sensitivity_label">Adjust sensitivity</string>
-    <string name="menu_share_label">Share lap times</string>
+    <string name="menu_share_label">Share times</string>
+    <string name="menu_csv_label">Save times as CSV</string>
     <string name="dialog_sensitivity_text">Adjust lap timer sensitivity</string>
     <string name="dialog_sensitivity_high">high</string>
     <string name="dialog_sensitivity_low">low</string>
