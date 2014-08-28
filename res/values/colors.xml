@@ -2,6 +2,7 @@
 <resources>
     <color name="bg">#EEEEEE</color>
     <color name="text">#035AA2</color>
+    <color name="text_fade">#CCCCCC</color>
     <color name="bar_red">#FF0000</color>
     <color name="bar_green">#00FF00</color>
     <color name="red_text">#E5464C</color>
