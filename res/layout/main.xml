@@ -1,86 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_gravity="center"
-    android:background="@drawable/bg"
-    android:keepScreenOn="true"
-    android:orientation="vertical"
-    android:padding="22dp" >
+    android:keepScreenOn="true" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:layout_marginBottom="15dp"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <RelativeLayout
-            android:layout_width="60dp"
-            android:layout_height="90dp" >
-
-            <SurfaceView
-                android:id="@+id/surface_camera"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
-
-            <View
-                android:id="@+id/camera_bar"
-                android:layout_width="48dp"
-                android:layout_height="3dp"
-                android:layout_centerInParent="true" />
-        </RelativeLayout>
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/bg"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="90dp" >
+
+                <SurfaceView
+                    android:id="@+id/surface_camera"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+
+                <View
+                    android:id="@+id/camera_bar"
+                    android:layout_width="48dp"
+                    android:layout_height="3dp"
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/text_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="0:00:0"
+                    android:textColor="@color/red_text"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/text_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/text" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/list_laps"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+        </ListView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/text_timer"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_start"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="0:00:0"
-                android:textColor="@color/red_text"
-                android:textSize="32sp"
-                android:textStyle="bold"
-                android:typeface="monospace" />
+                android:text="@string/label_start" />
 
-            <TextView
-                android:id="@+id/text_status"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_calibrate"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/text" />
+                android:text="@string/label_calibrate" />
         </LinearLayout>
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/list_laps"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
-    </ListView>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/button_start"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_start" />
-
-        <Button
-            android:id="@+id/button_calibrate"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/label_calibrate" />
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
