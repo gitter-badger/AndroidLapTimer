@@ -49,7 +49,7 @@
                     android:layout_gravity="center_horizontal"
                     android:text="0:00:0"
                     android:textColor="@color/red_text"
-                    android:textSize="40sp"
+                    android:textSize="32sp"
                     android:textStyle="bold"
                     android:typeface="monospace" />
 
@@ -58,8 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:textColor="@color/text"
-                    android:textSize="20sp" />
+                    android:textColor="@color/text" />
             </LinearLayout>
         </LinearLayout>
 
@@ -73,20 +72,19 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:orientation="vertical" >
 
             <Button
                 android:id="@+id/button_start"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 android:text="@string/label_start" />
 
             <Button
                 android:id="@+id/button_calibrate"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 android:text="@string/label_calibrate" />
         </LinearLayout>
     </LinearLayout>
