@@ -125,8 +125,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	    Locale.setDefault(locale);
 	    Configuration config = new Configuration();
 	    config.locale = locale;
-	    getBaseContext().getResources().updateConfiguration(config, 
-	    getBaseContext().getResources().getDisplayMetrics());
+	    getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
 	    */
 		
 		setContentView(R.layout.main);
@@ -576,10 +575,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 					writer.close();
 					fos.close();
 					
-					Toast.makeText(getBaseContext(), filename, Toast.LENGTH_LONG).show();
+					Toast.makeText(getBaseContext(), getString(R.string.menu_csv_ok) + filename, Toast.LENGTH_LONG).show();
 				} 
 				catch (Exception e) {
-					Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.menu_csv_ko) + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 				}
 				
 				return true;
