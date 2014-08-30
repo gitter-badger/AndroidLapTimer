@@ -243,13 +243,18 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 			try {
 				mCamera.setPreviewDisplay(surface);
+				mCamera.setPreviewCallbackWithBuffer(this);
+				mCamera.startPreview();
 			}
 			catch (IOException e) {
-				Log.e("Camera", "Could not set preview display");
+				// startPreview failed: die
+				new AlertDialog.Builder(this).setMessage(getString(R.string.error_camera_null_text)).setTitle("Error").setCancelable(true).setIcon(android.R.drawable.ic_dialog_info).setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						TimerActivity.this.finish();
+					}
+				}).show();
+				return;
 			}
-
-			mCamera.setPreviewCallbackWithBuffer(this);
-			mCamera.startPreview();
 		}
 	}
 
