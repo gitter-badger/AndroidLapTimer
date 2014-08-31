@@ -35,6 +35,16 @@
                     android:layout_width="48dp"
                     android:layout_height="3dp"
                     android:layout_centerInParent="true" />
+
+                <TextView
+                    android:id="@+id/text_fps"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center_horizontal"
+                    android:text="fps: -"
+                    android:textColor="@color/text_fade"
+                    android:textSize="8sp" />
             </RelativeLayout>
 
             <LinearLayout
@@ -44,9 +54,9 @@
 
                 <TextView
                     android:id="@+id/text_timer"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
                     android:text="0:00:0"
                     android:textColor="@color/red_text"
                     android:textSize="32sp"
@@ -55,9 +65,9 @@
 
                 <TextView
                     android:id="@+id/text_status"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
                     android:textColor="@color/text" />
             </LinearLayout>
         </LinearLayout>

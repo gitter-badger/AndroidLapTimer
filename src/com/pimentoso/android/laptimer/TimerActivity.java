@@ -42,7 +42,7 @@ import android.widget.Toast;
 public class TimerActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback, OnClickListener {
 	
 	private static final long DEFAULT_CATCH_DELAY = 500; // ignore laps shorter than this
-	private static final long CALIBRATION_ERROR_FRAMES = 40; // how many consecutive frames caught before calibration warning (about 2 sec) 
+	private static final long CALIBRATION_ERROR_FRAMES = 50; // how many consecutive frames caught before calibration warning (about 2 sec) 
 	
 	// layout elements
 	private SurfaceView mSurfaceView;
@@ -52,6 +52,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 	private View cameraBar;
 	private TextView timerLabel;
 	private TextView statusLabel;
+	private TextView fpsLabel;
 	private ListView lapList;
 	private LapListAdapter lapListAdapter;
 	private Button startButton;
@@ -105,7 +106,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 		public void run() {
 			long millis = SystemClock.uptimeMillis() - mStartTime;
-			timerLabel.setText(convertTime(millis));
+			timerLabel.setText(Utils.convertTime(millis));
 			mHandler.postAtTime(this, SystemClock.uptimeMillis() + 40);
 		}
 	};
@@ -136,6 +137,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		cameraBar = findViewById(R.id.camera_bar);
 		timerLabel = (TextView) findViewById(R.id.text_timer);
 		statusLabel = (TextView) findViewById(R.id.text_status);
+		fpsLabel = (TextView) findViewById(R.id.text_fps);
 		startButton = (Button) findViewById(R.id.button_start);
 		calibrateButton = (Button) findViewById(R.id.button_calibrate);
 		lapList = (ListView) findViewById(R.id.list_laps);
@@ -374,7 +376,10 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		}
 
 		mCamera.addCallbackBuffer(yuv);
-		fps.logFrame();
+		
+		// show FPS
+		fps.update();
+		fpsLabel.setText(fps.printFrames());
 	}
 
 	@Override
@@ -466,31 +471,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		return supportedPreviewSizes.get(index);
 	}
 
-
-	public static StringBuilder sb = new StringBuilder();
-	
-	public static String convertTime(long millis) {
-
-		if (millis == 0) {
-			return "0:00:0";
-		}
-
-		sb.setLength(0);
-		int split = ((int) (millis / 100)) % 10;
-		int seconds = (int) (millis / 1000);
-		int minutes = seconds / 60;
-		seconds = seconds % 60;
-
-		if (seconds < 10) {
-			sb.append(minutes).append(":0").append(seconds).append(":").append(split);
-		}
-		else {
-			sb.append(minutes).append(":").append(seconds).append(":").append(split);
-		}
-		
-		return sb.toString();
-	}
-
 	private void refreshLaps() {
 		lapListAdapter = new LapListAdapter(this, laps);
 		lapList.setAdapter(lapListAdapter);
@@ -499,7 +479,6 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		super.onCreateOptionsMenu(menu);
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
@@ -619,7 +598,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 		
 		for (int i = 0; i < laps.size(); i++) {
 			long lap = laps.get(i);
-			s.append("Lap ").append(i + 1).append(": ").append(convertTime(lap));
+			s.append("Lap ").append(i + 1).append(": ").append(Utils.convertTime(lap));
 			
 			if (i == bestIndex)
 				s.append(" (best)");
@@ -637,7 +616,7 @@ public class TimerActivity extends Activity implements SurfaceHolder.Callback, C
 
 		for (int i = 0; i < laps.size(); i++) {
 			long lap = laps.get(i);
-			s.append(i + 1).append(",").append(convertTime(lap)).append(",").append(lap).append("\r\n");
+			s.append(i + 1).append(",").append(Utils.convertTime(lap)).append(",").append(lap).append("\r\n");
 		}
 
 		return s.toString();
