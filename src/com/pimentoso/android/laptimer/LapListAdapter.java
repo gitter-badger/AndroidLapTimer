@@ -47,7 +47,7 @@ public class LapListAdapter extends BaseAdapter {
 				}
 	
 				currentItemMap.put("num", "Lap " + (i+1));
-				currentItemMap.put("time", TimerActivity.convertTime(lap));
+				currentItemMap.put("time", Utils.convertTime(lap));
 			}
 			
 			values.get(worstIndex).put("notice", "(worst)");
